@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>No Dor December Rating</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-image: url('https://images.unsplash.com/photo-1506452819137-0422416856b8');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: white;
+    }
+    header {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 1rem 2rem;
+      text-align: center;
+    }
+    main {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      color: white;
+    }
+    .rating-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .rating-form input, .rating-form textarea, .rating-form button {
+      padding: 0.8rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .rating-form input, .rating-form textarea {
+      background: rgba(255, 255, 255, 0.8);
+      color: black;
+    }
+    .rating-form textarea {
+      height: 80px;
+      resize: none;
+    }
+    .rating-form button {
+      background-color: #6200ea;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+    .rating-form button:hover {
+      background-color: #4500b5;
+    }
+    .ratings-list {
+      margin-top: 2rem;
+    }
+    .rating-item {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 5px;
+      color: black;
+    }
+    .rating-item .stars {
+      color: #ffb400;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>No Dor December</h1>
+    <p>Rate this challenge and share your thoughts!</p>
+  </header>
+  <main>
+    <section>
+      <form id="ratingForm" class="rating-form">
+        <label>
+          Your Name:
+          <input type="text" id="name" placeholder="Enter your name" required>
+        </label>
+        <label>
+          Rate this challenge (1 to 5 stars):
+          <input type="number" id="stars" min="1" max="5" required>
+        </label>
+        <label>
+          Leave a comment:
+          <textarea id="comment" rows="3" style="height: 80px; resize: none;" required></textarea>
+        </label>
+        <label>
+          How long do you plan to last (in days)?
+          <input type="range" id="duration" min="1" max="31" value="15" oninput="updateDurationLabel(this.value)">
+          <span id="durationLabel">15 days</span>
+        </label>
+        <button type="submit">Submit Rating</button>
+      </form>
+    </section>
+    <section class="ratings-list" id="ratingsList">
+      <h2>User Ratings</h2>
+    </section>
+  </main>
+  <script>
+    function updateDurationLabel(value) {
+      const durationLabel = document.getElementById('durationLabel');
+      durationLabel.textContent = `${value} days`;
+    }
+
+    function loadComments() {
+      const savedComments = JSON.parse(localStorage.getItem('comments')) || [];
+      savedComments.forEach((comment) => {
+        addCommentToPage(comment);
+      });
+    }
+
+    function addCommentToPage({ name, stars, comment, duration }) {
+      const ratingItem = document.createElement('div');
+      ratingItem.classList.add('rating-item');
+
+      const nameElement = document.createElement('h3');
+      nameElement.textContent = name;
+
+      const starsElement = document.createElement('div');
+      starsElement.classList.add('stars');
+      starsElement.textContent = '⭐'.repeat(stars);
+
+      const commentElement = document.createElement('p');
+      commentElement.textContent = comment;
+
+      const durationElement = document.createElement('p');
+      durationElement.textContent = `Planned duration: ${duration} days`;
+
+      ratingItem.appendChild(nameElement);
+      ratingItem.appendChild(starsElement);
+      ratingItem.appendChild(commentElement);
+      ratingItem.appendChild(durationElement);
+
+      document.getElementById('ratingsList').appendChild(ratingItem);
+    }
+
+    const ratingForm = document.getElementById('ratingForm');
+    ratingForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const stars = document.getElementById('stars').value;
+      const comment = document.getElementById('comment').value;
+      const duration = document.getElementById('duration').value;
+
+      const newComment = { name, stars, comment, duration };
+
+      const savedComments = JSON.parse(localStorage.getItem('comments')) || [];
+      savedComments.push(newComment);
+      localStorage.setItem('comments', JSON.stringify(savedComments));
+
+      addCommentToPage(newComment);
+
+      ratingForm.reset();
+      updateDurationLabel(15);
+    });
+
+    window.addEventListener('load', loadComments);
+  </script>
+</body>
+</html>
